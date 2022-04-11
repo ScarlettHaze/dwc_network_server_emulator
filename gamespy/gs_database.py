@@ -364,15 +364,14 @@ class GamespyDatabase(object):
 
     def update_profile(self, profileid, field):
         """Found profile id associated with session key.
-
         Start replacing each field one by one.
         TODO: Optimize this so it's done all in one update.
-        FIXME: Possible security issue due to embedding an unsanitized
-        string directly into the statement.
+        TODO: Check if other values than firstname/lastname are set using this
         """
-        with Transaction(self.conn) as tx:
-            q = "UPDATE users SET \"%s\" = ? WHERE profileid = ?"
-            tx.nonquery(q % field[0], (field[1], profileid))
+        if field[0] in ["firstname", "lastname"]:
+            with Transaction(self.conn) as tx:
+                q = "UPDATE users SET \"%s\" = ? WHERE profileid = ?"
+                tx.nonquery(q % field[0], (field[1], profileid))
 
     # Session functions
     # TODO: Cache session keys so we don't have to query the database every
